@@ -1,19 +1,19 @@
-package com.example.abhi.videoplayer.adapter;
+package com.example.abhi.videoplayer.recyclercomponents;
 
 /**
  * Created by abhic on 16-02-2017.
  */
 
 public class ListModel {
-    private int imageRes;
+    private String videoId;
     private String text;
 
-    public int getImageRes() {
-        return imageRes;
+    public String getVideoId() {
+        return videoId;
     }
 
-    public void setImageRes(int imageRes) {
-        this.imageRes = imageRes;
+    public void setVideoId(String videoId) {
+        this.videoId = videoId;
     }
 
     public String getText() {

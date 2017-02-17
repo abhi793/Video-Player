@@ -4,24 +4,59 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="@dimen/activity_horizontal_margin"
     tools:context="com.example.abhi.videoplayer.MainActivity"
     android:background="@drawable/background_gradient">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="In Theaters"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        android:id="@+id/in_theatres_text"
+        android:textSize="18sp"/>
 
     <com.example.abhi.videoplayer.uicomponents.IndicatorView
         android:id="@+id/in_theatres_indicator"
         android:layout_width="wrap_content"
+        android:layout_below="@+id/in_theatres_text"
+        android:layout_marginTop="5dp"
         android:layout_height="wrap_content" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/in_theatres"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_below="@+id/in_theatres_indicator"
+        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upcoming"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:layout_below="@+id/in_theatres"
+        android:layout_marginTop="20dp"
+        android:id="@+id/upcoming_text"
+        android:textSize="18sp"/>
+
+    <com.example.abhi.videoplayer.uicomponents.IndicatorView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/upcoming_indicator"
+        android:layout_below="@+id/upcoming_text"
+        android:layout_marginTop="5dp"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/upcoming"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/in_theatres"
-        android:layout_marginTop="50dp" />
+        android:layout_below="@id/upcoming_indicator"
+        android:layout_marginTop="20dp"
+        android:clipToPadding="false"/>
 
 </RelativeLayout>
