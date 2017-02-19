@@ -7,9 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.example.abhi.videoplayer.R;
+import com.example.abhi.videoplayer.RoundedTransform;
 import com.example.abhi.videoplayer.youtubedataservice.models.YoutubeData;
 import com.squareup.picasso.Picasso;
 
@@ -20,10 +20,10 @@ import java.util.List;
  */
 
 public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.ViewHolder> {
-
-
     private Context context;
     private List<YoutubeData> list;
+
+    OnVideoItemClickListener onVideoItemClickListener;
 
     public VideoListAdapter(Context context, List<YoutubeData> list) {
         this.context = context;
@@ -37,11 +37,16 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        Picasso.with(context).load(list.get(position).getItems().get(0).getSnippet().getThumbnails().getHigh().getUrl()).into(holder.imageView);
+        Picasso.with(context)
+                .load(list.get(position).getItems().get(0).getSnippet().getThumbnails().getHigh().getUrl())
+                .transform(new RoundedTransform(30, 0))
+                .into(holder.imageView);
         holder.floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context,"Hi "+ position,Toast.LENGTH_SHORT).show();
+                if (onVideoItemClickListener != null) {
+                    onVideoItemClickListener.onVideoItemClick(list.get(position).getItems().get(0).getId());
+                }
             }
         });
     }
@@ -60,5 +65,9 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.View
             imageView = (ImageView) itemView.findViewById(R.id.player_view);
             floatingActionButton = (FloatingActionButton) itemView.findViewById(R.id.play_button);
         }
+    }
+
+    public void setOnVideoItemClickListener(OnVideoItemClickListener onVideoItemClickListener) {
+        this.onVideoItemClickListener = onVideoItemClickListener;
     }
 }

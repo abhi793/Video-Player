@@ -8,13 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.abhi.videoplayer.Constants;
 import com.example.abhi.videoplayer.R;
+import com.example.abhi.videoplayer.RoundedTransform;
 import com.example.abhi.videoplayer.uicomponents.LoaderView;
 import com.example.abhi.videoplayer.youtubedataservice.models.YoutubeData;
-import com.google.android.youtube.player.YouTubeInitializationResult;
-import com.google.android.youtube.player.YouTubeThumbnailLoader;
-import com.google.android.youtube.player.YouTubeThumbnailView;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -41,7 +38,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(RecyclerViewAdapter.ViewHolder holder, int position) {
         if (list != null) {
             holder.textView.setText(list.get(position).getItems().get(0).getSnippet().getTitle());
-            Picasso.with(context).load(list.get(position).getItems().get(0).getSnippet().getThumbnails().getHigh().getUrl()).into(holder.imageView);
+            Picasso.with(context)
+                    .load(list.get(position).getItems().get(0).getSnippet().getThumbnails().getHigh().getUrl())
+                    .transform(new RoundedTransform(30, 0))
+                    .into(holder.imageView);
 
             holder.loaderView.setVisibility(View.GONE);
         }

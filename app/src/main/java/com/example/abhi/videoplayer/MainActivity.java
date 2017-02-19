@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 import com.example.abhi.videoplayer.recyclercomponents.GridListDecorator;
@@ -142,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerItemClick
 
     @Override
     public void onItemClick(RecyclerView recyclerView, View view, int position) {
-        Intent intent = new Intent(this, VideoPlayerActivity.class);
+        Intent intent = new Intent(this, VideoPresenterActivity.class);
         if (recyclerView == inTheatresListView) {
             intent.putExtra("LIST_TYPE", Constants.IN_THEATRES);
         } else if (recyclerView == upcomingListView) {

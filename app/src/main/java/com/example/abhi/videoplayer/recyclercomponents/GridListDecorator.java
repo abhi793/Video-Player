@@ -17,8 +17,8 @@ public class GridListDecorator extends RecyclerView.ItemDecoration {
 
     public GridListDecorator() {
         super();
-        horizontalSpacing = 10;
-        verticalSpacing = 5;
+        horizontalSpacing = 15;
+        verticalSpacing = 20;
 
         rowCount = 2;
     }

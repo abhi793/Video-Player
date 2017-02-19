@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="@drawable/background_gradient"
-    tools:context="com.example.abhi.videoplayer.VideoPlayerActivity">
+    tools:context="com.example.abhi.videoplayer.VideoPresenterActivity">
 
    <!-- <com.google.android.youtube.player.YouTubePlayerView
         android:id="@+id/youtube_player"
@@ -72,5 +72,11 @@
         android:layout_marginEnd="20dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"/>
+
+    <com.google.android.youtube.player.YouTubePlayerView
+        android:id="@+id/youtube_player"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
 
 </RelativeLayout>

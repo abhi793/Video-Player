@@ -3,14 +3,16 @@ package com.example.abhi.videoplayer;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.example.abhi.videoplayer.recyclercomponents.OnListItemCenteredListener;
+import com.example.abhi.videoplayer.recyclercomponents.OnVideoItemClickListener;
 import com.example.abhi.videoplayer.recyclercomponents.VideoListAdapter;
 import com.example.abhi.videoplayer.recyclercomponents.VideoListDecorator;
 import com.example.abhi.videoplayer.recyclercomponents.VideoListLayoutManager;
@@ -22,14 +24,13 @@ import com.example.abhi.videoplayer.youtubedataservice.models.YoutubeData;
 import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerView;
 
 import java.util.List;
 
-public class VideoPlayerActivity extends YouTubeBaseActivity implements YouTubePlayer.OnInitializedListener, OnListItemCenteredListener {
+public class VideoPresenterActivity extends YouTubeBaseActivity implements YouTubePlayer.OnInitializedListener, OnListItemCenteredListener, OnVideoItemClickListener, YouTubePlayer.OnFullscreenListener {
     private @Constants.ListType int listType;
     private int position;
-
-    private String videoId;
 
     private ServiceConnection serviceConnection;
     private YoutubeDataServiceInputProvider youtubeDataServiceInputProvider;
@@ -41,14 +42,16 @@ public class VideoPlayerActivity extends YouTubeBaseActivity implements YouTubeP
     private TextView durationText;
     private RatingView ratingView;
     private RecyclerView videoList;
+    private YouTubePlayerView youTubePlayerView;
 
     private VideoListAdapter videoListAdapter;
     private VideoListLayoutManager videoListLayoutManager;
+    private YouTubePlayer youTubePlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_video_player);
+        setContentView(R.layout.activity_video_presenter);
 
         createServiceConnection();
 
@@ -59,6 +62,8 @@ public class VideoPlayerActivity extends YouTubeBaseActivity implements YouTubeP
 
         initViews();
         setViews();
+
+        youTubePlayerView.initialize(Constants.DEVELOPER_KEY, this);
     }
 
     private void setRecyclerView() {
@@ -67,6 +72,8 @@ public class VideoPlayerActivity extends YouTubeBaseActivity implements YouTubeP
         videoListLayoutManager.setOnListItemCenteredListener(this);
 
         videoListAdapter = new VideoListAdapter(this, list);
+
+        videoListAdapter.setOnVideoItemClickListener(this);
 
         videoList.setAdapter(videoListAdapter);
         videoList.setLayoutManager(videoListLayoutManager);
@@ -79,12 +86,6 @@ public class VideoPlayerActivity extends YouTubeBaseActivity implements YouTubeP
         descriptionText.setText(list.get(position).getItems().get(0).getSnippet().getDescription());
         durationText.setText("Runtime: " + 133 + " mins");
         ratingView.animateArcUsingFraction(0.81f);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //playButton.setVisibility(View.GONE);
     }
 
     @Override
@@ -110,9 +111,6 @@ public class VideoPlayerActivity extends YouTubeBaseActivity implements YouTubeP
                         list = youtubeDataServiceInputProvider.getUpcomingList();
                         break;
                 }
-
-                videoId = list.get(position).getItems().get(0).getId();
-
                 setRecyclerView();
             }
 
@@ -129,6 +127,7 @@ public class VideoPlayerActivity extends YouTubeBaseActivity implements YouTubeP
         durationText = (TextView)findViewById(R.id.runtime_text);
         ratingView = (RatingView) findViewById(R.id.rating_view);
         videoList = (RecyclerView) findViewById(R.id.player_recycler_view);
+        youTubePlayerView = (YouTubePlayerView) findViewById(R.id.youtube_player);
     }
 
     private void setViews() {
@@ -137,13 +136,9 @@ public class VideoPlayerActivity extends YouTubeBaseActivity implements YouTubeP
 
     @Override
     public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
-        /*youTubePlayer.cueVideo(videoId);
-        youTubePlayer.setPlayerStyle(YouTubePlayer.PlayerStyle.MINIMAL);
+        this.youTubePlayer = youTubePlayer;
+        youTubePlayer.setOnFullscreenListener(this);
 
-        titleText.setText(list.get(position).getItems().get(0).getSnippet().getTitle());
-        descriptionText.setText(list.get(position).getItems().get(0).getSnippet().getDescription());
-        durationText.setText("Runtime: " + (Math.round(youTubePlayer.getDurationMillis() / 1000f / 60f)) + " mins");
-        ratingView.animateArcUsingFraction(0.81f);*/
     }
 
     @Override
@@ -151,18 +146,17 @@ public class VideoPlayerActivity extends YouTubeBaseActivity implements YouTubeP
 
     }
 
-    /*@Override
+    @Override
     public void onBackPressed() {
-        if ((youTubePlayer != null) && (youTubePlayer.isPlaying())) {
-            youTubePlayer.seekToMillis(youTubePlayer.getDurationMillis());
-            youTubePlayer.setFullscreen(false);
-            playButton.setVisibility(View.VISIBLE);
+        if ((youTubePlayer != null) && (youTubePlayerView.getVisibility() == View.VISIBLE)) {
+            youTubePlayer.pause();
+            youTubePlayerView.setVisibility(View.GONE);
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            youTubePlayer.cueVideo(videoId);
+            videoListLayoutManager.stabilizeList();
         } else {
             super.onBackPressed();
         }
-    }*/
+    }
 
     @Override
     public void OnListItemCentered(int position) {
@@ -170,6 +164,21 @@ public class VideoPlayerActivity extends YouTubeBaseActivity implements YouTubeP
         descriptionText.setText(list.get(position).getItems().get(0).getSnippet().getDescription());
         durationText.setText("Runtime: " + 133 + " mins");
         ratingView.animateArcUsingFraction(0.81f);
+    }
+
+    @Override
+    public void onVideoItemClick(String videoId) {
+        youTubePlayer.loadVideo(videoId);
+        youTubePlayer.setFullscreen(true);
+        youTubePlayer.setPlayerStyle(YouTubePlayer.PlayerStyle.DEFAULT);
+    }
+
+    @Override
+    public void onFullscreen(boolean b) {
+        if (b) {
+            youTubePlayerView.setVisibility(View.VISIBLE);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
     }
 
     @Override
