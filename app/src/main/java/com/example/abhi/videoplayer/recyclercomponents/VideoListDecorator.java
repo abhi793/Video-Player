@@ -6,21 +6,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 /**
- * Created by abhic on 17-02-2017.
+ * Created by abhic on 19-02-2017.
  */
 
-public class GridListDecorator extends RecyclerView.ItemDecoration {
-    private int horizontalSpacing;
-    private int verticalSpacing;
+public class VideoListDecorator extends RecyclerView.ItemDecoration {
+    private int endMargin;
 
-    private int rowCount;
-
-    public GridListDecorator() {
+    public VideoListDecorator() {
         super();
-        horizontalSpacing = 10;
-        verticalSpacing = 5;
-
-        rowCount = 2;
+        endMargin = 200;
     }
 
     @Override
@@ -37,16 +31,10 @@ public class GridListDecorator extends RecyclerView.ItemDecoration {
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         int position = parent.getChildAdapterPosition(view);
 
-        if ((position == parent.getAdapter().getItemCount() - 2) || (position == parent.getAdapter().getItemCount() - 1)) {
-            outRect.right = 0;
-        } else {
-            outRect.right = horizontalSpacing;
-        }
-
-        if (position % rowCount == 0) {
-            outRect.bottom = verticalSpacing;
-        } else {
-            outRect.top = verticalSpacing;
+        if (position == 0) {
+            outRect.left = endMargin;
+        } else if (position == parent.getAdapter().getItemCount() - 1) {
+            outRect.right = endMargin;
         }
     }
 }
