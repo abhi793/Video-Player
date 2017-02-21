@@ -1,10 +1,15 @@
 package com.example.abhi.videoplayer;
 
 import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -44,12 +49,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerItemClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (!isInternetConnected(this)){
+            buildAlertMessageNoInternet();
+        }
 
-        createServiceConnection();
+            createServiceConnection();
 
-        startService(new Intent(this, YoutubeDataService.class));
-        bindService(new Intent(this, YoutubeDataService.class), serviceConnection, BIND_AUTO_CREATE);
-
+            /*startService(new Intent(this, YoutubeDataService.class));
+            bindService(new Intent(this, YoutubeDataService.class), serviceConnection, BIND_AUTO_CREATE);*/
         Constants.setVideoIds();
         Constants.setUpcomingVideoIds();
         visibleViewCount = 4;
@@ -60,6 +67,16 @@ public class MainActivity extends AppCompatActivity implements RecyclerItemClick
         upcomingIndicatorView.setTotalItems(Constants.getVideoIds(Constants.UPCOMING).size() / visibleViewCount);
 
         setRecyclerViews();
+    }
+
+    @Override
+    protected void onStart() {
+        if(inTheatresList==null && isInternetConnected(this))
+        {
+            startService(new Intent(this, YoutubeDataService.class));
+            bindService(new Intent(this, YoutubeDataService.class), serviceConnection, BIND_AUTO_CREATE);
+        }
+        super.onStart();
     }
 
     private void createServiceConnection() {
@@ -166,8 +183,40 @@ public class MainActivity extends AppCompatActivity implements RecyclerItemClick
 
     @Override
     protected void onDestroy() {
-        unbindService(serviceConnection);
-        stopService(new Intent(this, YoutubeDataService.class));
+        if(inTheatresList!=null) {
+            unbindService(serviceConnection);
+            stopService(new Intent(this, YoutubeDataService.class));
+        }
         super.onDestroy();
+    }
+    private void buildAlertMessageNoInternet() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Your internet seems to be disabled, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivityForResult(new Intent(android.provider.Settings.ACTION_SETTINGS), 0);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+    private static boolean isInternetConnected(Context context) {
+        ConnectivityManager manager = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = manager.getActiveNetworkInfo();
+        if (info == null) {
+            return false;
+        }
+        if (info.getState() != NetworkInfo.State.CONNECTED) {
+            return false;
+        }
+        return true;
     }
 }
